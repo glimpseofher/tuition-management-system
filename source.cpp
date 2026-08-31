@@ -79,10 +79,16 @@ void displayAttendance();
 void updateAttendance();
 void deleteAttendance();
 
+void summaryReport();
+void detailedReport();
+void statisticsReport();
+void sortRecord();
+
 void studentMenu();
 void serviceMenu();
 void bookingMenu();
 void attendanceMenu();
+void reportMenu();
 void mainMenu();
 
 // ======================= MAIN FUNCTION =======================
@@ -410,6 +416,223 @@ void deleteAttendance() {
     }
     cout << "Attendance NOT FOUND!\n";
 }
+// ======================= REPORT MODULE =======================
+string getServiceNameByID(const string& serviceID) {
+    for (int i = 0; i < serviceCount; i++) {
+        if (services[i].id == serviceID) {
+            return services[i].name;
+        }
+    }
+    return "Service not found.";
+}
+
+double getServicePriceByID(const string& serviceID) {
+    for (int i = 0; i < serviceCount; i++) {
+        if (services[i].id == serviceID) {
+            return services[i].price;
+        }
+    }
+    return 0.0;
+}
+
+void summaryReport() {
+    if (studentCount == 0) {
+        cout << "\nNo student records available to display in summary.\n" << endl;
+        return;
+    }
+    cout << "\n=======================================================================\n";
+    cout << "                            SUMMARY REPORT                             \n";
+    cout << "=======================================================================\n";
+    cout << left << setw(12) << "Student ID"
+        << setw(20) << "Student Name"
+        << setw(14) << "Booking ID"
+        << setw(14) << "Service ID"
+        << setw(10) << "Price (RM)" << "\n";
+    cout << "-----------------------------------------------------------------------\n";
+    double totalValue = 0.0;
+    int totalBookingsCount = 0;
+    for (int i = 0; i < studentCount; i++) {
+        bool hasBooking = false;
+
+        // Search for all bookings belonging to this student
+        for (int j = 0; j < bookingCount; j++) {
+            if (bookings[j].studentID == students[i].id) {
+                hasBooking = true;
+                totalBookingsCount++;
+                double price = getServicePriceByID(bookings[j].serviceID);
+                totalValue += price;
+
+                cout << left << setw(12) << students[i].id
+                     << setw(20) << students[i].name
+                     << setw(14) << bookings[j].id
+                     << setw(14) << bookings[j].serviceID
+                     << fixed << setprecision(2) << price << endl;
+            }
+        }
+        // Display students who do not have any bookings recorded
+        if (!hasBooking) {
+            cout << left << setw(12) << students[i].id
+                << setw(20) << students[i].name
+                << setw(14) << "N/A"
+                << setw(14) << "No Bookings"
+                << fixed << setprecision(2) << 0.00 << endl;
+        }
+    }
+    cout << "-----------------------------------------------------------------------\n";
+    cout << "Total Students Listed: " << studentCount << endl;
+    cout << "Total Active Bookings: " << totalBookingsCount << endl;
+    cout << "Total Revenue Expected: RM " << fixed << setprecision(2) << totalValue << endl;
+    cout << "=======================================================================\n\n";
+}
+
+void detailedReport() {
+    if (studentCount == 0) {
+        cout << "\nNo student records available.\n" << endl;
+        return;
+    }
+    cout << "\n=======================================================================\n";
+    cout << "                          DETAILED STUDENT REPORT                      \n";
+    cout << "=======================================================================\n";
+    for (int i = 0; i < studentCount; i++) {
+        cout << "STUDENT PROFILE #" << (i + 1) << "\n";
+        cout << "  ID   : " << students[i].id << "\n";
+        cout << "  Name : " << students[i].name << "\n";
+        cout << "  Age  : " << students[i].age << "\n";
+        cout << "  -- Bookings & Attendance History --\n";
+        bool hasBookings = false;
+        double studentTotalSpent = 0.0;
+        for (int j = 0; j < bookingCount; j++) {
+            if (bookings[j].studentID == students[i].id) {
+                hasBookings = true;
+                string sName = getServiceNameByID(bookings[j].serviceID);
+                double price = getServicePriceByID(bookings[j].serviceID);
+                studentTotalSpent += price;
+                // Find matching attendance record status
+                string statusStr = "Not Marked";
+                for (int k = 0; k < attendanceCount; k++) {
+                    if (attendances[k].studentID == students[i].id &&
+                        attendances[k].serviceID == bookings[j].serviceID &&
+                        attendances[k].date == bookings[j].date) {
+                        statusStr = (attendances[k].status == 1 || attendances[k].status == PRESENT) ? "Present" : "Absent";
+                        break;
+                    }
+                }
+                cout << "     * Booking ID: " << bookings[j].id
+                    << " | Service: " << sName
+                    << " (RM " << fixed << setprecision(2) << price << ")"
+                    << " | Date: " << bookings[j].date
+                    << " | Status: " << statusStr << "\n";
+            }
+        }
+        if (!hasBookings) {
+            cout << "     (No active bookings found for this student)\n";
+        }
+        else {
+            cout << "  Total Spent: RM " << fixed << setprecision(2) << studentTotalSpent << "\n";
+        }
+        cout << "-----------------------------------------------------------------------\n";
+    }
+    cout << "=======================================================================\n\n";
+}
+
+void statisticsReport() {
+    cout << "\n=======================================================================\n";
+    cout << "                             STATISTICS REPORT                         \n";
+    cout << "=======================================================================\n";
+    cout << left << setw(35) << "Total Enrolled Students" << ": " << studentCount << endl;
+    cout << left << setw(35) << "Total Available Services" << ": " << serviceCount << endl;
+    cout << left << setw(35) << "Total Bookings Recorded" << ": " << bookingCount << endl;
+
+    // Revenue calculation
+    double totalExpectedRevenue = 0.0;
+    for (int i = 0; i < bookingCount; i++) {
+        totalExpectedRevenue += getServicePriceByID(bookings[i].serviceID);
+    }
+
+    double avgBookingValue = (bookingCount > 0) ? (totalExpectedRevenue / bookingCount) : 0.0;//returns 0 if no booking
+    cout << left << setw(35) << "Total Expected Revenue" << ": RM " << fixed << setprecision(2) << totalExpectedRevenue << endl;
+    cout << left << setw(35) << "Average Value Per Booking" << ": RM " << fixed << setprecision(2) << avgBookingValue << endl;
+
+    // Attendance stats calculation
+    int presentCount = 0;
+    int absentCount = 0;
+    for (int i = 0; i < attendanceCount; i++) {
+        if (attendances[i].status == 1 || attendances[i].status == PRESENT) {
+            presentCount++;
+        }
+        else {
+            absentCount++;
+        }
+    }
+
+    double attendanceRate = (attendanceCount > 0) ? ((double)presentCount / attendanceCount) * 100.0 : 0.0; 
+
+    cout << "-----------------------------------------------------------------------\n";
+    cout << "ATTENDANCE METRICS:\n";
+    cout << "  - Total Records Processed : " << attendanceCount << endl;
+    cout << "  - Present Sessions        : " << presentCount << endl;
+    cout << "  - Absent Sessions         : " << absentCount << endl;
+    cout << "  - Overall Attendance Rate : " << fixed << setprecision(1) << attendanceRate << "%\n";
+    cout << "=======================================================================\n\n";
+}
+
+void sortRecord() {
+    if (studentCount <= 1) {
+        cout << "\nNot enough records to sort.\n" << endl;
+        return;
+    }
+    int choice = getIntInput("1.Sort by name \n2.Sort by ID\n Enter choice: ");
+    switch (choice) {
+
+
+        case 1: {
+            // Bubble sort algorithm sorting students by name
+            for (int i = 0; i < studentCount - 1; i++) {
+                for (int j = 0; j < studentCount - i - 1; j++) {
+                    if (students[j].name > students[j + 1].name) {
+                        // Swap student objects
+                        Student temp = students[j];
+                        students[j] = students[j + 1];
+                        students[j + 1] = temp;
+                    }
+                }
+            }
+            cout << "\nStudent records sorted successfully by Name (A-Z)!\n" << endl;
+            break;
+        }
+
+        case 2: {
+            if (studentCount <= 1) {
+                cout << "\nNot enough records to sort.\n" << endl;
+                return;
+            }
+
+            // Selection Sort algorithm for student id
+            for (int i = 0; i < studentCount - 1; i++) {
+                int small = i; 
+
+                //find
+                for (int j = i + 1; j < studentCount; j++) {
+                    if (students[j].id < students[small].id) {
+                        small = j;
+                    }
+                }
+
+                //swap
+                if (small != i) {
+                    Student temp = students[small];
+                    students[small] = students[i];
+                    students[i] = temp;
+                }
+            }
+
+            cout << "\nStudent records sorted successfully by Name!\n" << endl;
+            break;
+        }
+        default:
+            cout << "\nInvalid input, please try again.\n" << endl; return;
+        }
+    }
 
 // ======================= SAVE & LOAD DATA =======================
 void saveData() {
@@ -492,6 +715,8 @@ void loadData() {
     cout << "Data has loaded succesfully!\n" << endl;
 }
 
+
+
 // ======================= MENUS =======================
 void studentMenu() {
     int choice;
@@ -556,6 +781,28 @@ void bookingMenu() {
     } while (choice != 5);
 }
 
+void reportMenu() {
+    int choice;
+    do {
+        cout << "\n--- Report Generation ---\n";
+        cout << "1. Generate Summary Report\n";
+        cout << "2. Generate Detailed Report\n";
+        cout << "3. Generate Statistics\n";
+        cout << "4. Sort Records\n";
+        cout << "5. Back to Main Menu\n";
+        choice = getIntInput("Enter choice: ");
+        switch (choice) {
+        case 1: summaryReport(); break;
+        case 2: detailedReport(); break;
+        case 3: statisticsReport(); break;
+        case 4: sortRecord(); break;
+        case 5: break;
+        default: cout << "Invalid choice!\n";
+        }
+    } while (choice != 5);
+}
+
+
 void attendanceMenu() {
     int choice;
     do {
@@ -586,20 +833,21 @@ void mainMenu() {
         cout << "2. Service Management\n";
         cout << "3. Booking Management\n";
         cout << "4. Attendance Management\n";
-        cout << "5. Save Data\n";
-        cout << "6. Load Data\n";
-        cout << "7. Exit\n";
+        cout << "5. Report Generation\n";
+        cout << "6. Save Data\n";
+        cout << "7. Load Data\n";   
+        cout << "0. Exit\n";
         choice = getIntInput("Enter choice: ");
         switch (choice) {
         case 1: studentMenu(); break;
         case 2: serviceMenu(); break;
         case 3: bookingMenu(); break;
         case 4: attendanceMenu(); break;
-        case 5: saveData(); break;
-        case 6: loadData(); break;
-        case 7: cout << "Exiting program...\n"; break;
+        case 5: reportMenu(); break;
+        case 6: saveData(); break;
+        case 7: loadData(); break;
+        case 0: cout << "Exiting program...\n"; break;
         default: cout << "Invalid choice!\n";
         }
-    } while (choice != 7);
+    } while (choice != 0);
 }
-```
