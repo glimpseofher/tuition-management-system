@@ -336,26 +336,22 @@ void deleteBooking() {
 // ======================= ATTENDANCE MANAGEMENT =======================
 void markAttendance() {
     string ID, sID, svID, date;
-    cout << "Enter Attendance ID: "; cin >> ID;
-    if (IDexists(attendances, attendanceCount, ID)) {
-        cout << "Duplicate attendance ID found! Please enter again.\n";
-        return;
+    cout << "Enter Attendance ID: "; getline(cin, ID);
+    while (IDexists(attendances, attendanceCount, ID)) {
+        cout << "Duplicate attendance ID found! Please enter again: "; getline(cin, ID);
     }
-    cout << "Enter Student ID: "; cin >> sID;
-    if (!IDexists(students, studentCount, sID)) {
-        cout << "Student NOT FOUND! Please enter again.\n";
-        return;
+    cout << "Enter Student ID: "; getline(cin, sID);
+    while (!IDexists(students, studentCount, sID)) {
+        cout << "Student NOT FOUND! Please enter again: "; getline(cin, sID);
     }
-    cout << "Enter Service ID: "; cin >> svID;
-    if (!IDexists(services, serviceCount, svID)) {
-        cout << "Service NOT FOUND! Please enter again.\n";
-        return;
+    cout << "Enter Service ID: "; getline(cin, svID);
+    while (!IDexists(services, serviceCount, svID)) {
+        cout << "Service NOT FOUND! Please enter again: "; getline(cin, svID);
     }
-    cout << "Enter Attendance Date: "; cin >> date;
+    cout << "Enter Attendance Date: "; getline(cin, date);
     int status = getIntInput("Enter Attendance Status: \n0: Absent \n1: Present \n> ");
-    if (status != 0 && status != 1) {
-        cout << "Invalid Attendance Status! Please enter again.\n";
-        return;
+    while (status != 0 && status != 1) {
+        status = getIntInput("Invalid Attendance Status! Please enter again: ");
     }
     attendances[attendanceCount++] = { ID, sID, svID, date, static_cast<attendanceStatus>(status) };
     cout << "Attendance Created!\n";
@@ -379,7 +375,13 @@ void updateAttendance() {
     for (int i = 0; i < attendanceCount; i++) {
         if (attendances[i].id == id) {
             cout << "Enter new Student ID: "; getline(cin, attendances[i].studentID);
+            while (!IDexists(students, studentCount, attendances[i].studentID)) {
+                cout << "Student NOT FOUND! Please enter again: "; getline(cin, attendances[i].studentID);
+            }
             cout << "Enter new Service ID: "; getline(cin, attendances[i].serviceID);
+            while (!IDexists(services, serviceCount, attendances[i].serviceID)) {
+                cout << "Service NOT FOUND! Please enter again: "; getline(cin, attendances[i].serviceID);
+            }
             cout << "Enter new Date: "; getline(cin, attendances[i].date);
             int status = getIntInput("Enter new Attendance Status: \n0: Absent \n1: Present \n> ");
             while (status != 0 && status != 1) {
