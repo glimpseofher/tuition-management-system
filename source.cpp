@@ -602,11 +602,6 @@ void sortRecord() {
         }
 
         case 2: {
-            if (studentCount <= 1) {
-                cout << "\nNot enough records to sort.\n" << endl;
-                return;
-            }
-
             // Selection Sort algorithm for student id
             for (int i = 0; i < studentCount - 1; i++) {
                 int small = i; 
