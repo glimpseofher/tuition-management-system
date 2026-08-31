@@ -621,7 +621,7 @@ void sortRecord() {
                 }
             }
 
-            cout << "\nStudent records sorted successfully by Name!\n" << endl;
+            cout << "\nStudent records sorted successfully by ID!\n" << endl;
             break;
         }
         default:
