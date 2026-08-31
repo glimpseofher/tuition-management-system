@@ -549,7 +549,7 @@ void statisticsReport() {
         totalExpectedRevenue += getServicePriceByID(bookings[i].serviceID);
     }
 
-    double avgBookingValue = (bookingCount > 0) ? (totalExpectedRevenue / bookingCount) : 0.0;//returns 0 if no booking
+    double avgBookingValue = (bookingCount > 0) ? (totalExpectedRevenue / bookingCount) : 0.0;//returns 0 if booking is less than/is zero
     cout << left << setw(35) << "Total Expected Revenue" << ": RM " << fixed << setprecision(2) << totalExpectedRevenue << endl;
     cout << left << setw(35) << "Average Value Per Booking" << ": RM " << fixed << setprecision(2) << avgBookingValue << endl;
 
