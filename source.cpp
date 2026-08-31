@@ -382,9 +382,8 @@ void updateAttendance() {
             cout << "Enter new Service ID: "; getline(cin, attendances[i].serviceID);
             cout << "Enter new Date: "; getline(cin, attendances[i].date);
             int status = getIntInput("Enter new Attendance Status: \n0: Absent \n1: Present \n> ");
-            if (status != 0 && status != 1) {
-                cout << "Invalid Attendance Status! Please enter again.\n";
-                return;
+            while (status != 0 && status != 1) {
+                status = getIntInput("Invalid Attendance Status! Please enter again: ");
             }
             attendances[i].status = static_cast<attendanceStatus>(status);
             cout << "Attendance has updated!\n";
