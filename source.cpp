@@ -21,7 +21,8 @@ struct Service {
     double price = 0.0;
 };
 
-struct Booking {
+struct Booking 
+{
     string id;
     string studentID;
     string serviceID;
@@ -79,20 +80,15 @@ void displayAttendance();
 void updateAttendance();
 void deleteAttendance();
 
-void summaryReport();
-void detailedReport();
-void statisticsReport();
-void sortRecord();
-
 void studentMenu();
 void serviceMenu();
 void bookingMenu();
 void attendanceMenu();
-void reportMenu();
+void preloaded();
 void mainMenu();
-
 // ======================= MAIN FUNCTION =======================
-int main() {
+int main() 
+{
     mainMenu();
     return 0;
 }
@@ -157,6 +153,83 @@ string getNameByID(Service records[], int count, string id) {
         if (records[i].id == id) return records[i].name;
     }
     return "Name NOT FOUND!";
+}
+
+// ======================= ATTENDANCE MANAGEMENT =======================
+void markAttendance() {
+    string ID, sID, svID, date;
+    cout << "Enter Attendance ID: "; cin >> ID;
+    if (IDexists(attendances, attendanceCount, ID)) {
+        cout << "Duplicate attendance ID found! Please enter again.\n";
+        return;
+    }
+    cout << "Enter Student ID: "; cin >> sID;
+    if (!IDexists(students, studentCount, sID)) {
+        cout << "Student NOT FOUND! Please enter again.\n";
+        return;
+    }
+    cout << "Enter Service ID: "; cin >> svID;
+    if (!IDexists(services, serviceCount, svID)) {
+        cout << "Service NOT FOUND! Please enter again.\n";
+        return;
+    }
+    cout << "Enter Attendance Date: "; cin >> date;
+    int status = getIntInput("Enter Attendance Status: \n0: Absent \n1: Present \n> ");
+    if (status != 0 && status != 1) {
+        cout << "Invalid Attendance Status! Please enter again.\n";
+        return;
+    }
+    attendances[attendanceCount++] = { ID, sID, svID, date, static_cast<attendanceStatus>(status) };
+    cout << "Attendance Created!\n";
+}
+
+void displayAttendance() {
+    cout << "======== Attendance ========\n";
+    for (int i = 0; i < attendanceCount; i++) {
+        cout << left
+            << setw(6) << attendances[i].id << "|"
+            << setw(40) << getNameByID(students, studentCount, attendances[i].studentID) << "|"
+            << setw(40) << getNameByID(services, serviceCount, attendances[i].serviceID) << "|"
+            << setw(14) << attendances[i].date << "|"
+            << setw(10) << ((attendances[i].status == PRESENT) ? "Present" : "Absent") << "\n";
+    }
+}
+
+void updateAttendance() {
+    string id;
+    cout << "Enter Attendance ID to update: "; getline(cin, id);
+    for (int i = 0; i < attendanceCount; i++) {
+        if (attendances[i].id == id) {
+            cout << "Enter new Student ID: "; getline(cin, attendances[i].studentID);
+            cout << "Enter new Service ID: "; getline(cin, attendances[i].serviceID);
+            cout << "Enter new Date: "; getline(cin, attendances[i].date);
+            int status = getIntInput("Enter new Attendance Status: \n0: Absent \n1: Present \n> ");
+            if (status != 0 && status != 1) {
+                cout << "Invalid Attendance Status! Please enter again.\n";
+                return;
+            }
+            attendances[i].status = static_cast<attendanceStatus>(status);
+            cout << "Attendance has updated!\n";
+            return;
+        }
+    }
+    cout << "Attendance not found!\n";
+}
+
+void deleteAttendance() {
+    string id;
+    cout << "Enter Attendance ID to delete: "; getline(cin, id);
+    for (int i = 0; i < attendanceCount; i++) {
+        if (attendances[i].id == id) {
+            for (int j = i; j < attendanceCount - 1; j++) {
+                attendances[j] = attendances[j + 1];
+            }
+            attendanceCount--;
+            cout << "Attendance deleted!\n";
+            return;
+        }
+    }
+    cout << "Attendance NOT FOUND!\n";
 }
 
 // ======================= USER MANAGEMENT =======================
@@ -272,63 +345,188 @@ void deleteService() {
 }
 
 // ======================= BOOKING MANAGEMENT =======================
-void createBooking() {
-    if (studentCount == 0 || serviceCount == 0) {
-        cout << "You must have at least one student AND one service before booking!\n";
+// ======================= BOOKING MANAGEMENT =======================
+
+string dateconv()
+{
+    int date, day, month, year;
+
+    while (true)
+    {  
+        cout << "Enter a date (DD/MM/YYYY): " << endl;
+        cin >> day >> month >> year;
+        if (year < 2026 || year > 2099 || month <= 0 || month > 12 || day <= 0 || day > 31)
+        {
+            cout << "Invalid input or zero input" << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+        }
+        else
+        {
+            break;
+        }
+        break;
+    }
+        date = (year * 10000) + (month * 100) + day;
+        string sdate = to_string(date);
+        return sdate;
+}
+//int daterev()
+//{
+//    int date, year, month, day;
+//    if (month < 10)
+//    {
+//    }
+//    if (month >= 10)
+//    {
+//        date = (year * 10000) + (month * 100) + day;
+//    }
+//}
+void createBooking() 
+{
+    if (studentCount == 0 && serviceCount == 0)
+    {
+        cout << "You Must Have At Least One Student And One Service Before Booking!\n";
         return;
     }
-    string bID, sID, svID, date;
-    cout << "Enter Booking ID: "; getline(cin, bID);
-    if (IDexists(bookings, bookingCount, bID)) {
-        cout << "Duplicate Booking ID!\n";
+
+    if (studentCount == 0 || serviceCount == 0)
+    {
+        cout << "You must have at least one more student Or service before making a booking";
         return;
     }
-    cout << "Enter Student ID: "; getline(cin, sID);
-    if (!IDexists(students, studentCount, sID)) {
-        cout << "Student NOT FOUND!\n";
+    
+    if (bookingCount >= MAX_RECORDS)
+    {
+        cout << "Booking storage is full,Please try to delete or change booking details!" << endl;
         return;
     }
-    cout << "Enter Service ID: "; getline(cin, svID);
-    if (!IDexists(services, serviceCount, svID)) {
-        cout << "Service NOT FOUND!\n";
+    Booking booking;
+    string StudentId, ServiceId;
+    cout << "Enter Booking ID: "; 
+    cin >> booking.id;
+    if (IDexists(bookings, bookingCount, booking.id))
+    {
+        cout << "Duplicate Booking ID Detected!" << endl;
         return;
     }
-    cout << "Enter Date (DD/MM/YYYY): "; getline(cin, date);
-    bookings[bookingCount++] = { bID, sID, svID, date };
-    cout << "Booking created!\n";
+    else
+    {
+        cout << "Booking ID accepted!" << endl << endl;
+    }
+    
+    cout << "Enter Student ID: "; 
+    cin >> booking.studentID;
+    if (!IDexists(students, studentCount, booking.studentID))
+    {
+        cout << "Student ID Not Found\n";
+        return;
+    }
+    else
+    {
+        cout << "Student ID accepted!" << endl << endl;
+    }
+    cout << "Enter Service ID: ";
+    cin >> booking.serviceID;
+    if (!IDexists(services, serviceCount, booking.serviceID))
+    {
+        cout << "Service ID Not found!" << endl;
+        return;
+    }
+    else
+    {
+        cout << "Booking ID accepted!" << endl;
+    }
+
+    Booking stuff;
+    booking.date = dateconv();
+
+    bookings[bookingCount++] = booking;
+    cout << "Booking succesfully created!" << endl;
+
 }
 
-void displayBookings() {
-    cout << "\n--- Bookings ---\n";
-    for (int i = 0; i < bookingCount; i++) {
-        cout << bookings[i].id << " | "
-            << getNameByID(students, studentCount, bookings[i].studentID) << " | "
-            << getNameByID(services, serviceCount, bookings[i].serviceID) << " | "
-            << bookings[i].date << endl;
+void displayBookings() 
+{
+    
+    cout << endl << "===============================================" << endl;
+    cout << setw(30) << "BOOKING MODULE" << endl;
+    cout <<         "===============================================" << endl;
+    for (int i = 0; i < bookingCount; i++) 
+    {
+        cout << bookings[i].id << " | ";
+        cout << getNameByID(students, studentCount, bookings[i].studentID) << " | ";
+        cout << getNameByID(services, serviceCount, bookings[i].serviceID) << " | ";
+        cout << bookings[i].date << endl;
     }
 }
 
-void updateBooking() {
-    string id;
-    cout << "Enter Booking ID to update: "; getline(cin, id);
-    for (int i = 0; i < bookingCount; i++) {
-        if (bookings[i].id == id) {
-            cout << "Enter new Student ID: "; getline(cin, bookings[i].studentID);
-            cout << "Enter new Service ID: "; getline(cin, bookings[i].serviceID);
-            cout << "Enter new Date: "; getline(cin, bookings[i].date);
-            cout << "Booking updated!\n";
+void updateBooking() 
+{
+    string changeID;
+    cout << "Enter Booking ID to update: "; getline(cin,changeID);
+    for (int i = 0; i < bookingCount; i++)
+    {
+        if (bookings[i].id == changeID)
+        {
+            cout << "Enter changed Student's ID: "; 
+            getline(cin,bookings[i].studentID);
+            cout << "Enter a changed Service ID: "; 
+            getline(cin,bookings[i].serviceID);
+            bookings[i].date = dateconv();
+            cout << "Booking succesfully updated!" << endl;
+            return;
+        }
+        else 
+        {
+            cout << "Booking not found,Try Again!" << endl;
+        }
+    }
+    
+}
+
+void searchBooking() 
+{
+    if (bookingCount == 0) 
+    {
+        cout << "No bookings available to search!\n";
+        return;
+    }
+    Booking booking;
+    cout << "Enter Booking ID to search: ";
+    cin >> booking.id;
+
+    for (int i = 0; i < bookingCount; i++) 
+    {
+        if (bookings[i].id == booking.id) 
+        {
+            cout << endl << "===============================================" << endl;
+            cout << setw(35) << "Booking found";
+            cout << endl << "===============================================" << endl;
+            cout << "Booking ID : " << bookings[i].id << endl;
+            cout << "Student    : " << getNameByID(students, studentCount, bookings[i].studentID)
+                << " (ID: " << bookings[i].studentID << ")" << endl;
+            cout << "Service    : " << getNameByID(services, serviceCount, bookings[i].serviceID)
+                << " (ID: " << bookings[i].serviceID << ")" << endl;
+            cout << "Date       : " << bookings[i].date << endl;
             return;
         }
     }
-    cout << "Booking not found!\n";
+    cout << "Booking ID not found!\n";
 }
 
-void deleteBooking() {
+void deleteBooking() 
+{
     string id;
-    cout << "Enter Booking ID to delete: "; getline(cin, id);
-    for (int i = 0; i < bookingCount; i++) {
-        if (bookings[i].id == id) {
-            for (int j = i; j < bookingCount - 1; j++) {
+    cout << "Enter Booking ID to delete: "; 
+    getline(cin, id);
+    for (int i = 0; i < bookingCount; i++) 
+    {
+        if (bookings[i].id == id)
+        {
+            for (int j = i; j < bookingCount - 1; j++) 
+            {
                 bookings[j] = bookings[j + 1];
             }
             bookingCount--;
@@ -339,83 +537,6 @@ void deleteBooking() {
     cout << "Booking not found!\n";
 }
 
-// ======================= ATTENDANCE MANAGEMENT =======================
-void markAttendance() {
-    string ID, sID, svID, date;
-    cout << "Enter Attendance ID: "; getline(cin, ID);
-    while (IDexists(attendances, attendanceCount, ID)) {
-        cout << "Duplicate attendance ID found! Please enter again: "; getline(cin, ID);
-    }
-    cout << "Enter Student ID: "; getline(cin, sID);
-    while (!IDexists(students, studentCount, sID)) {
-        cout << "Student NOT FOUND! Please enter again: "; getline(cin, sID);
-    }
-    cout << "Enter Service ID: "; getline(cin, svID);
-    while (!IDexists(services, serviceCount, svID)) {
-        cout << "Service NOT FOUND! Please enter again: "; getline(cin, svID);
-    }
-    cout << "Enter Attendance Date: "; getline(cin, date);
-    int status = getIntInput("Enter Attendance Status: \n0: Absent \n1: Present \n> ");
-    while (status != 0 && status != 1) {
-        status = getIntInput("Invalid Attendance Status! Please enter again: ");
-    }
-    attendances[attendanceCount++] = { ID, sID, svID, date, static_cast<attendanceStatus>(status) };
-    cout << "Attendance Created!\n";
-}
-
-void displayAttendance() {
-    cout << "======== Attendance ========\n";
-    for (int i = 0; i < attendanceCount; i++) {
-        cout << left
-            << setw(6) << attendances[i].id << "|"
-            << setw(40) << getNameByID(students, studentCount, attendances[i].studentID) << "|"
-            << setw(40) << getNameByID(services, serviceCount, attendances[i].serviceID) << "|"
-            << setw(14) << attendances[i].date << "|"
-            << setw(10) << ((attendances[i].status == PRESENT) ? "Present" : "Absent") << "\n";
-    }
-}
-
-void updateAttendance() {
-    string id;
-    cout << "Enter Attendance ID to update: "; getline(cin, id);
-    for (int i = 0; i < attendanceCount; i++) {
-        if (attendances[i].id == id) {
-            cout << "Enter new Student ID: "; getline(cin, attendances[i].studentID);
-            while (!IDexists(students, studentCount, attendances[i].studentID)) {
-                cout << "Student NOT FOUND! Please enter again: "; getline(cin, attendances[i].studentID);
-            }
-            cout << "Enter new Service ID: "; getline(cin, attendances[i].serviceID);
-            while (!IDexists(services, serviceCount, attendances[i].serviceID)) {
-                cout << "Service NOT FOUND! Please enter again: "; getline(cin, attendances[i].serviceID);
-            }
-            cout << "Enter new Date: "; getline(cin, attendances[i].date);
-            int status = getIntInput("Enter new Attendance Status: \n0: Absent \n1: Present \n> ");
-            while (status != 0 && status != 1) {
-                status = getIntInput("Invalid Attendance Status! Please enter again: ");
-            }
-            attendances[i].status = static_cast<attendanceStatus>(status);
-            cout << "Attendance has updated!\n";
-            return;
-        }
-    }
-    cout << "Attendance not found!\n";
-}
-
-void deleteAttendance() {
-    string id;
-    cout << "Enter Attendance ID to delete: "; getline(cin, id);
-    for (int i = 0; i < attendanceCount; i++) {
-        if (attendances[i].id == id) {
-            for (int j = i; j < attendanceCount - 1; j++) {
-                attendances[j] = attendances[j + 1];
-            }
-            attendanceCount--;
-            cout << "Attendance deleted!\n";
-            return;
-        }
-    }
-    cout << "Attendance NOT FOUND!\n";
-}
 // ======================= REPORT MODULE =======================
 string getServiceNameByID(const string& serviceID) {
     for (int i = 0; i < serviceCount; i++) {
@@ -463,10 +584,10 @@ void summaryReport() {
                 totalValue += price;
 
                 cout << left << setw(12) << students[i].id
-                     << setw(20) << students[i].name
-                     << setw(14) << bookings[j].id
-                     << setw(14) << bookings[j].serviceID
-                     << fixed << setprecision(2) << price << endl;
+                    << setw(20) << students[i].name
+                    << setw(14) << bookings[j].id
+                    << setw(14) << bookings[j].serviceID
+                    << fixed << setprecision(2) << price << endl;
             }
         }
         // Display students who do not have any bookings recorded
@@ -565,7 +686,7 @@ void statisticsReport() {
         }
     }
 
-    double attendanceRate = (attendanceCount > 0) ? ((double)presentCount / attendanceCount) * 100.0 : 0.0; 
+    double attendanceRate = (attendanceCount > 0) ? ((double)presentCount / attendanceCount) * 100.0 : 0.0;
 
     cout << "-----------------------------------------------------------------------\n";
     cout << "ATTENDANCE METRICS:\n";
@@ -585,49 +706,50 @@ void sortRecord() {
     switch (choice) {
 
 
-        case 1: {
-            // Bubble sort algorithm sorting students by name
-            for (int i = 0; i < studentCount - 1; i++) {
-                for (int j = 0; j < studentCount - i - 1; j++) {
-                    if (students[j].name > students[j + 1].name) {
-                        // Swap student objects
-                        Student temp = students[j];
-                        students[j] = students[j + 1];
-                        students[j + 1] = temp;
-                    }
+    case 1: {
+        // Bubble sort algorithm sorting students by name
+        for (int i = 0; i < studentCount - 1; i++) {
+            for (int j = 0; j < studentCount - i - 1; j++) {
+                if (students[j].name > students[j + 1].name) {
+                    // Swap student objects
+                    Student temp = students[j];
+                    students[j] = students[j + 1];
+                    students[j + 1] = temp;
                 }
             }
-            cout << "\nStudent records sorted successfully by Name (A-Z)!\n" << endl;
-            break;
         }
-
-        case 2: {
-            // Selection Sort algorithm for student id
-            for (int i = 0; i < studentCount - 1; i++) {
-                int small = i; 
-
-                //find
-                for (int j = i + 1; j < studentCount; j++) {
-                    if (students[j].id < students[small].id) {
-                        small = j;
-                    }
-                }
-
-                //swap
-                if (small != i) {
-                    Student temp = students[small];
-                    students[small] = students[i];
-                    students[i] = temp;
-                }
-            }
-
-            cout << "\nStudent records sorted successfully by ID!\n" << endl;
-            break;
-        }
-        default:
-            cout << "\nInvalid input, please try again.\n" << endl; return;
-        }
+        cout << "\nStudent records sorted successfully by Name (A-Z)!\n" << endl;
+        break;
     }
+
+    case 2: {
+        // Selection Sort algorithm for student id
+        for (int i = 0; i < studentCount - 1; i++) {
+            int small = i;
+
+            //find
+            for (int j = i + 1; j < studentCount; j++) {
+                if (students[j].id < students[small].id) {
+                    small = j;
+                }
+            }
+
+            //swap
+            if (small != i) {
+                Student temp = students[small];
+                students[small] = students[i];
+                students[i] = temp;
+            }
+        }
+
+        cout << "\nStudent records sorted successfully by ID!\n" << endl;
+        break;
+    }
+    default:
+        cout << "\nInvalid input, please try again.\n" << endl; return;
+    }
+}
+
 
 // ======================= SAVE & LOAD DATA =======================
 void saveData() {
@@ -710,8 +832,6 @@ void loadData() {
     cout << "Data has loaded succesfully!\n" << endl;
 }
 
-
-
 // ======================= MENUS =======================
 void studentMenu() {
     int choice;
@@ -721,17 +841,17 @@ void studentMenu() {
         cout << "2. Display Students\n";
         cout << "3. Update Student\n";
         cout << "4. Delete Student\n";
-        cout << "5. Back to Main Menu\n";
+        cout << "0. Back to Main Menu\n";
         choice = getIntInput("Enter choice: ");
         switch (choice) {
         case 1: addStudent(); break;
         case 2: displayStudents(); break;
         case 3: updateStudent(); break;
         case 4: deleteStudent(); break;
-        case 5: break;
+        case 0: break;
         default: cout << "Invalid choice!\n";
         }
-    } while (choice != 5);
+    } while (choice != 0);
 }
 
 void serviceMenu() {
@@ -742,38 +862,50 @@ void serviceMenu() {
         cout << "2. Display Services\n";
         cout << "3. Update Service\n";
         cout << "4. Delete Service\n";
-        cout << "5. Back to Main Menu\n";
+        cout << "0. Back to Main Menu\n";
         choice = getIntInput("Enter choice: ");
         switch (choice) {
         case 1: addService(); break;
         case 2: displayServices(); break;
         case 3: updateService(); break;
         case 4: deleteService(); break;
-        case 5: break;
+        case 0: break;
         default: cout << "Invalid choice!\n";
         }
-    } while (choice != 5);
+    } while (choice != 0);
 }
 
-void bookingMenu() {
+void bookingMenu() 
+{
     int choice;
-    do {
-        cout << "\n--- Booking Management ---\n";
-        cout << "1. Create Booking\n";
-        cout << "2. Display Bookings\n";
-        cout << "3. Update Booking\n";
-        cout << "4. Delete Booking\n";
-        cout << "5. Back to Main Menu\n";
+    do 
+    {
+        cout << endl << "=======Booking Management=======" << endl;
+        cout << "1. Create Booking" << endl;
+        cout << "2. Display Bookings" << endl;
+        cout << "3. Update Booking" << endl;
+        cout << "4. Search Booking" << endl;
+        cout << "5. Delete Booking" << endl;
+        cout << "0. Main Menu" << endl;
         choice = getIntInput("Enter choice: ");
-        switch (choice) {
-        case 1: createBooking(); break;
-        case 2: displayBookings(); break;
-        case 3: updateBooking(); break;
-        case 4: deleteBooking(); break;
-        case 5: break;
-        default: cout << "Invalid choice!\n";
+        switch (choice) 
+        {
+            case 1: createBooking(); 
+                break;
+            case 2: displayBookings();
+                break;
+            case 3: updateBooking(); 
+                break;
+            case 4:searchBooking();
+                break;
+            case 5: deleteBooking();
+                break;
+            case 0:
+                break;
+            default:
+                cout << "Invalid choice!\n";
         }
-    } while (choice != 5);
+    } while (choice != 0);
 }
 
 void reportMenu() {
@@ -794,7 +926,7 @@ void reportMenu() {
         case 5: break;
         default: cout << "Invalid choice!\n";
         }
-    } while (choice != 5);
+    } while (choice != 0);
 }
 
 
@@ -806,17 +938,17 @@ void attendanceMenu() {
         cout << "2. Display Attendance\n";
         cout << "3. Update Attendance\n";
         cout << "4. Delete Attendance\n";
-        cout << "5. Back to Main Menu\n";
+        cout << "0. Back to Main Menu\n";
         choice = getIntInput("Enter choice: ");
         switch (choice) {
         case 1: markAttendance(); break;
         case 2: displayAttendance(); break;
         case 3: updateAttendance(); break;
         case 4: deleteAttendance(); break;
-        case 5: break;
+        case 0: break;
         default: cout << "Invalid choice!\n";
         }
-    } while (choice != 5);
+    } while (choice != 0);
 }
 
 // ======================= MAIN MENU =======================
@@ -830,7 +962,7 @@ void mainMenu() {
         cout << "4. Attendance Management\n";
         cout << "5. Report Generation\n";
         cout << "6. Save Data\n";
-        cout << "7. Load Data\n";   
+        cout << "7. Load Data\n";
         cout << "0. Exit\n";
         choice = getIntInput("Enter choice: ");
         switch (choice) {
@@ -845,4 +977,4 @@ void mainMenu() {
         default: cout << "Invalid choice!\n";
         }
     } while (choice != 0);
-}
+}               
