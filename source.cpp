@@ -58,6 +58,7 @@ bool IDexists(Attendance records[], int count, string id);
 
 string getNameByID(Student records[], int count, string id);
 string getNameByID(Service records[], int count, string id);
+string dateconv();
 
 void addStudent();
 void searchStudent();
@@ -158,26 +159,22 @@ string getNameByID(Service records[], int count, string id) {
 // ======================= ATTENDANCE MANAGEMENT =======================
 void markAttendance() {
     string ID, sID, svID, date;
-    cout << "Enter Attendance ID: "; cin >> ID;
-    if (IDexists(attendances, attendanceCount, ID)) {
-        cout << "Duplicate attendance ID found! Please enter again.\n";
-        return;
+    cout << "Enter Attendance ID: "; getline(cin, ID);
+    while (IDexists(attendances, attendanceCount, ID)) {
+        cout << "Duplicate attendance ID found! Please enter again: "; getline(cin, ID);
     }
-    cout << "Enter Student ID: "; cin >> sID;
-    if (!IDexists(students, studentCount, sID)) {
-        cout << "Student NOT FOUND! Please enter again.\n";
-        return;
+    cout << "Enter Student ID: "; getline(cin, sID);
+    while (!IDexists(students, studentCount, sID)) {
+        cout << "Student NOT FOUND! Please enter again: "; getline(cin, sID);
     }
-    cout << "Enter Service ID: "; cin >> svID;
-    if (!IDexists(services, serviceCount, svID)) {
-        cout << "Service NOT FOUND! Please enter again.\n";
-        return;
+    cout << "Enter Service ID: "; getline(cin, svID);
+    while (!IDexists(services, serviceCount, svID)) {
+        cout << "Service NOT FOUND! Please enter again: "; getline(cin, svID);
     }
-    cout << "Enter Attendance Date: "; cin >> date;
+    date = dateconv();
     int status = getIntInput("Enter Attendance Status: \n0: Absent \n1: Present \n> ");
-    if (status != 0 && status != 1) {
-        cout << "Invalid Attendance Status! Please enter again.\n";
-        return;
+    while (status != 0 && status != 1) {
+        status = getIntInput("Invalid Attendance Status! Please enter again: ");
     }
     attendances[attendanceCount++] = { ID, sID, svID, date, static_cast<attendanceStatus>(status) };
     cout << "Attendance Created!\n";
@@ -201,12 +198,17 @@ void updateAttendance() {
     for (int i = 0; i < attendanceCount; i++) {
         if (attendances[i].id == id) {
             cout << "Enter new Student ID: "; getline(cin, attendances[i].studentID);
+            while (!IDexists(students, studentCount, attendances[i].studentID)) {
+                cout << "Student NOT FOUND! Please enter again: "; getline(cin, attendances[i].studentID);
+            }
             cout << "Enter new Service ID: "; getline(cin, attendances[i].serviceID);
-            cout << "Enter new Date: "; getline(cin, attendances[i].date);
+            while (!IDexists(services, serviceCount, attendances[i].serviceID)) {
+                cout << "Service NOT FOUND! Please enter again: "; getline(cin, attendances[i].serviceID);
+            }
+            attendances[i].date = dateconv();
             int status = getIntInput("Enter new Attendance Status: \n0: Absent \n1: Present \n> ");
-            if (status != 0 && status != 1) {
-                cout << "Invalid Attendance Status! Please enter again.\n";
-                return;
+            while (status != 0 && status != 1) {
+                status = getIntInput("Invalid Attendance Status! Please enter again: ");
             }
             attendances[i].status = static_cast<attendanceStatus>(status);
             cout << "Attendance has updated!\n";
@@ -916,14 +918,14 @@ void reportMenu() {
         cout << "2. Generate Detailed Report\n";
         cout << "3. Generate Statistics\n";
         cout << "4. Sort Records\n";
-        cout << "5. Back to Main Menu\n";
+        cout << "0. Back to Main Menu\n";
         choice = getIntInput("Enter choice: ");
         switch (choice) {
         case 1: summaryReport(); break;
         case 2: detailedReport(); break;
         case 3: statisticsReport(); break;
         case 4: sortRecord(); break;
-        case 5: break;
+        case 0: break;
         default: cout << "Invalid choice!\n";
         }
     } while (choice != 0);
