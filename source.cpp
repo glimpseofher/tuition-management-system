@@ -762,7 +762,7 @@ void serviceBreakdown() { //Track booking amt for service, calc rev per service,
     int totalBookings = 0;
 
     cout << "\n==========================================================================================\n";
-    cout << "                                    SERVICE REVENUE & POPULARITY REPORT\n";
+    cout << "                            SERVICE REVENUE & POPULARITY REPORT\n";
     cout << "==========================================================================================\n";
     cout << left << setw(17) << "Service Name"
         << setw(25) << "Service ID"
