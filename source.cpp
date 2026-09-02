@@ -91,6 +91,7 @@ void studentMenu();
 void serviceMenu();
 void bookingMenu();
 void attendanceMenu();
+void reportMenu();
 void preloaded();
 void mainMenu();
 // ======================= MAIN FUNCTION =======================
