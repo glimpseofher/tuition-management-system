@@ -21,7 +21,7 @@ struct Service {
     double price = 0.0;
 };
 
-struct Booking 
+struct Booking
 {
     string id;
     string studentID;
@@ -81,6 +81,12 @@ void displayAttendance();
 void updateAttendance();
 void deleteAttendance();
 
+void summaryReport();
+void detailedReport();
+void statisticsReport();
+void sortRecord();
+void serviceBreakdownReport();
+
 void studentMenu();
 void serviceMenu();
 void bookingMenu();
@@ -88,13 +94,16 @@ void attendanceMenu();
 void preloaded();
 void mainMenu();
 // ======================= MAIN FUNCTION =======================
-int main() 
+int main()
 {
+
     mainMenu();
     return 0;
 }
 
 // ====== Function Definitions ======
+
+
 // ======================= VALIDATION =======================
 int getIntInput(string prompt) {
     int choice;
@@ -354,7 +363,7 @@ string dateconv()
     int date, day, month, year;
 
     while (true)
-    {  
+    {
         cout << "Enter a date (DD/MM/YYYY): " << endl;
         cin >> day >> month >> year;
         if (year < 2026 || year > 2099 || month <= 0 || month > 12 || day <= 0 || day > 31)
@@ -370,13 +379,13 @@ string dateconv()
         }
         break;
     }
-        date = (year * 10000) + (month * 100) + day;
-        string sdate = to_string(date);
-        return sdate;
+    date = (year * 10000) + (month * 100) + day;
+    string sdate = to_string(date);
+    return sdate;
 }
 
 
-void createBooking() 
+void createBooking()
 {
     if (studentCount == 0 && serviceCount == 0)
     {
@@ -389,7 +398,7 @@ void createBooking()
         cout << "You must have at least one more student Or service before making a booking";
         return;
     }
-    
+
     if (bookingCount >= MAX_RECORDS)
     {
         cout << "Booking storage is full,Please try to delete or change booking details!" << endl;
@@ -397,7 +406,7 @@ void createBooking()
     }
     Booking booking;
     string StudentId, ServiceId;
-    cout << "Enter Booking ID: "; 
+    cout << "Enter Booking ID: ";
     cin >> booking.id;
     if (IDexists(bookings, bookingCount, booking.id))
     {
@@ -408,8 +417,8 @@ void createBooking()
     {
         cout << "Booking ID accepted!" << endl << endl;
     }
-    
-    cout << "Enter Student ID: "; 
+
+    cout << "Enter Student ID: ";
     cin >> booking.studentID;
     if (!IDexists(students, studentCount, booking.studentID))
     {
@@ -440,13 +449,13 @@ void createBooking()
 
 }
 
-void displayBookings() 
+void displayBookings()
 {
-    
+
     cout << endl << "===============================================" << endl;
     cout << setw(30) << "BOOKING MODULE" << endl;
-    cout <<         "===============================================" << endl;
-    for (int i = 0; i < bookingCount; i++) 
+    cout << "===============================================" << endl;
+    for (int i = 0; i < bookingCount; i++)
     {
         cout << bookings[i].id << " | ";
         cout << getNameByID(students, studentCount, bookings[i].studentID) << " | ";
@@ -455,44 +464,45 @@ void displayBookings()
     }
 }
 
-void updateBooking() 
+void updateBooking()
 {
     string changeID;
-    cout << "Enter Booking ID to update: "; getline(cin,changeID);
+    cout << "Enter Booking ID to update: "; getline(cin, changeID);
     for (int i = 0; i < bookingCount; i++)
     {
         if (bookings[i].id == changeID)
         {
-            cout << "Enter changed Student's ID: "; 
-            getline(cin,bookings[i].studentID);
-            cout << "Enter a changed Service ID: "; 
-            getline(cin,bookings[i].serviceID);
+            cout << "Enter changed Student's ID: ";
+            getline(cin, bookings[i].studentID);
+            cout << "Enter a changed Service ID: ";
+            getline(cin, bookings[i].serviceID);
             bookings[i].date = dateconv();
             cout << "Booking succesfully updated!" << endl;
             return;
         }
-        else 
+        else
         {
             cout << "Booking not found,Try Again!" << endl;
         }
     }
-    
+
 }
 
-void searchBooking() 
+void searchBooking()
 {
-    if (bookingCount == 0) 
+    if (bookingCount == 0)
     {
         cout << "No bookings available to search!\n";
         return;
     }
-    Booking booking;
+    Booking booking; 
+
     cout << "Enter Booking ID to search: ";
     cin >> booking.id;
 
-    for (int i = 0; i < bookingCount; i++) 
+    for (int i = 0; i < bookingCount; i++)
     {
-        if (bookings[i].id == booking.id) 
+        if (bookings[i].id == booking.id)
         {
             cout << endl << "===============================================" << endl;
             cout << setw(35) << "Booking found";
@@ -509,16 +519,16 @@ void searchBooking()
     cout << "Booking ID not found!\n";
 }
 
-void deleteBooking() 
+void deleteBooking()
 {
     string id;
-    cout << "Enter Booking ID to delete: "; 
+    cout << "Enter Booking ID to delete: ";
     getline(cin, id);
-    for (int i = 0; i < bookingCount; i++) 
+    for (int i = 0; i < bookingCount; i++)
     {
         if (bookings[i].id == id)
         {
-            for (int j = i; j < bookingCount - 1; j++) 
+            for (int j = i; j < bookingCount - 1; j++)
             {
                 bookings[j] = bookings[j + 1];
             }
@@ -743,6 +753,52 @@ void sortRecord() {
     }
 }
 
+void serviceBreakdown() { //Track booking amt for service, calc rev per service, identify top performers, highlight inactive service
+    if (serviceCount == 0) {
+        cout << "\nNo service records available.\n" << endl;
+        return;
+    }
+    double totalRevenue = 0;
+    int totalBookings = 0;
+
+    cout << "\n==========================================================================================\n";
+    cout << "                                    SERVICE REVENUE & POPULARITY REPORT\n";
+    cout << "==========================================================================================\n";
+    cout << left << setw(17) << "Service Name"
+        << setw(25) << "Service ID"
+        << setw(14) << "Price (RM)"
+        << setw(16) << "Total Bookings"
+        << setw(15) << "Total Revenue" << endl;
+    cout << "------------------------------------------------------------------------------------------\n";
+
+    for (int i = 0; i < serviceCount; i++) {
+        int bookingCountperService = 0;
+        for (int j = 0; j < bookingCount; j++) {
+            if (bookings[j].serviceID == services[i].id) {
+                bookingCountperService++;
+            }
+        }
+        double perServiceRevenue = bookingCountperService * services[i].price;
+        totalRevenue += perServiceRevenue;
+        totalBookings += bookingCountperService;
+
+
+
+        cout << left << setw(17) << services[i].name
+             << setw(25) << services[i].id
+             << setw(14) << services[i].price 
+             << setw(16) <<  bookingCountperService
+             << setw(10) << "RM" << fixed << setprecision(2) << perServiceRevenue << endl;
+    }
+    cout << "------------------------------------------------------------------------------------------\n";
+    cout << setw(22) << "Total Services :" << serviceCount << endl
+         << setw(22) << "Total Bookings :" << totalBookings << endl
+         << setw(20) << "Total Revenue  :" << "RM" << fixed << setprecision(2) << totalRevenue << endl;
+
+    cout << "\n==========================================================================================\n";
+}
+
+
 
 // ======================= SAVE & LOAD DATA =======================
 void saveData() {
@@ -868,10 +924,10 @@ void serviceMenu() {
     } while (choice != 0);
 }
 
-void bookingMenu() 
+void bookingMenu()
 {
     int choice;
-    do 
+    do
     {
         cout << endl << "=======Booking Management=======" << endl;
         cout << "1. Create Booking" << endl;
@@ -881,22 +937,22 @@ void bookingMenu()
         cout << "5. Delete Booking" << endl;
         cout << "0. Main Menu" << endl;
         choice = getIntInput("Enter choice: ");
-        switch (choice) 
+        switch (choice)
         {
-            case 1: createBooking(); 
-                break;
-            case 2: displayBookings();
-                break;
-            case 3: updateBooking(); 
-                break;
-            case 4:searchBooking();
-                break;
-            case 5: deleteBooking();
-                break;
-            case 0:
-                break;
-            default:
-                cout << "Invalid choice!\n";
+        case 1: createBooking();
+            break;
+        case 2: displayBookings();
+            break;
+        case 3: updateBooking();
+            break;
+        case 4:searchBooking();
+            break;
+        case 5: deleteBooking();
+            break;
+        case 0:
+            break;
+        default:
+            cout << "Invalid choice!\n";
         }
     } while (choice != 0);
 }
@@ -909,6 +965,7 @@ void reportMenu() {
         cout << "2. Generate Detailed Report\n";
         cout << "3. Generate Statistics\n";
         cout << "4. Sort Records\n";
+        cout << "5. Generate Service Breakdown Report\n";
         cout << "0. Back to Main Menu\n";
         choice = getIntInput("Enter choice: ");
         switch (choice) {
@@ -916,6 +973,7 @@ void reportMenu() {
         case 2: detailedReport(); break;
         case 3: statisticsReport(); break;
         case 4: sortRecord(); break;
+        case 5: serviceBreakdown(); break;
         case 0: break;
         default: cout << "Invalid choice!\n";
         }
@@ -970,4 +1028,4 @@ void mainMenu() {
         default: cout << "Invalid choice!\n";
         }
     } while (choice != 0);
-}               
+}
