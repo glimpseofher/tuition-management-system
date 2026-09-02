@@ -374,17 +374,8 @@ string dateconv()
         string sdate = to_string(date);
         return sdate;
 }
-//int daterev()
-//{
-//    int date, year, month, day;
-//    if (month < 10)
-//    {
-//    }
-//    if (month >= 10)
-//    {
-//        date = (year * 10000) + (month * 100) + day;
-//    }
-//}
+
+
 void createBooking() 
 {
     if (studentCount == 0 && serviceCount == 0)
