@@ -897,7 +897,7 @@ void studentMenu() {
         case 2: displayStudents(); break;
         case 3: updateStudent(); break;
         case 4: deleteStudent(); break;
-        case 0: break;
+        case 0: cout << "Exiting to main menu...\n"; break;
         default: cout << "Invalid choice!\n";
         }
     } while (choice != 0);
@@ -918,7 +918,7 @@ void serviceMenu() {
         case 2: displayServices(); break;
         case 3: updateService(); break;
         case 4: deleteService(); break;
-        case 0: break;
+        case 0: cout << "Exiting to main menu...\n"; break;
         default: cout << "Invalid choice!\n";
         }
     } while (choice != 0);
@@ -950,7 +950,7 @@ void bookingMenu()
         case 5: deleteBooking();
             break;
         case 0:
-            break;
+            cout << "Exiting to main menu...\n"; break;
         default:
             cout << "Invalid choice!\n";
         }
@@ -974,7 +974,7 @@ void reportMenu() {
         case 3: statisticsReport(); break;
         case 4: sortRecord(); break;
         case 5: serviceBreakdown(); break;
-        case 0: break;
+        case 0: cout << "Exiting to main menu...\n"; break;
         default: cout << "Invalid choice!\n";
         }
     } while (choice != 0);
@@ -996,7 +996,7 @@ void attendanceMenu() {
         case 2: displayAttendance(); break;
         case 3: updateAttendance(); break;
         case 4: deleteAttendance(); break;
-        case 0: break;
+        case 0: cout << "Exiting to main menu...\n"; break;
         default: cout << "Invalid choice!\n";
         }
     } while (choice != 0);
