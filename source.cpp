@@ -683,51 +683,72 @@ void detailedReport() {
         cout << "\nNo student records available.\n" << endl;
         return;
     }
-    cout << "\n=======================================================================\n";
-    cout << "                          DETAILED STUDENT REPORT                      \n";
-    cout << "=======================================================================\n";
-    for (int i = 0; i < studentCount; i++) {
-        cout << "STUDENT PROFILE #" << (i + 1) << "\n";
-        cout << "  ID   : " << students[i].id << "\n";
-        cout << "  Name : " << students[i].name << "\n";
-        cout << "  Age  : " << students[i].age << "\n";
-        cout << "  -- Bookings & Attendance History --\n";
-        bool hasBookings = false;
-        double studentTotalSpent = 0.0;
-        for (int j = 0; j < bookingCount; j++) {
-            if (bookings[j].studentID == students[i].id) {
-                hasBookings = true;
-                string sName = getServiceNameByID(bookings[j].serviceID);
-                double price = getServicePriceByID(bookings[j].serviceID);
-                studentTotalSpent += price;
-                // Find matching attendance record status
-                string statusStr = "Not Marked";
-                for (int k = 0; k < attendanceCount; k++) {
-                    if (attendances[k].studentID == students[i].id &&
-                        attendances[k].serviceID == bookings[j].serviceID &&
-                        attendances[k].date == bookings[j].date) {
-                        statusStr = (attendances[k].status == 1 || attendances[k].status == PRESENT) ? "Present" : "Absent";
-                        break;
-                    }
-                }
-                cout << "     * Booking ID: " << bookings[j].id
-                    << " | Service: " << sName
-                    << " (RM " << fixed << setprecision(2) << price << ")"
-                    << " | Date: " << bookings[j].date
-                    << " | Status: " << statusStr << "\n";
-            }
-        }
-        if (!hasBookings) {
-            cout << "     (No active bookings found for this student)\n";
-        }
-        else {
-            cout << "  Total Spent: RM " << fixed << setprecision(2) << studentTotalSpent << "\n";
-        }
-        cout << "-----------------------------------------------------------------------\n";
-    }
-    cout << "=======================================================================\n\n";
-}
 
+    string targetID;
+    cout << "Please enter an ID to search for: ";
+    if (cin.peek() == '\n')
+    cin.ignore();
+    getline(cin, targetID);
+
+    bool found = false;
+
+    for (int i = 0; i < studentCount; i++) {
+        if (students[i].id == targetID) {
+            found = true;
+
+            cout << "\n=======================================================================\n";
+            cout << "                          DETAILED STUDENT REPORT                      \n";
+            cout << "=======================================================================\n";
+            cout << "STUDENT PROFILE\n";
+            cout << "  ID   : " << students[i].id << "\n";
+            cout << "  Name : " << students[i].name << "\n";
+            cout << "  Age  : " << students[i].age << "\n";
+            cout << "  -- Bookings & Attendance History --\n";
+
+            bool hasBookings = false;
+            double studentTotalSpent = 0.0;
+
+            for (int j = 0; j < bookingCount; j++) {
+                if (bookings[j].studentID == students[i].id) {
+                    hasBookings = true;
+                    string sName = getServiceNameByID(bookings[j].serviceID);
+                    double price = getServicePriceByID(bookings[j].serviceID);
+                    studentTotalSpent += price;
+
+                    string statusStr = "Not Marked";
+                    for (int k = 0; k < attendanceCount; k++) {
+                        if (attendances[k].studentID == students[i].id &&
+                            attendances[k].serviceID == bookings[j].serviceID &&
+                            attendances[k].date == bookings[j].date) {
+                            statusStr = (attendances[k].status == 1 || attendances[k].status == PRESENT) ? "Present" : "Absent";
+                            break;
+                        }
+                    }
+                    cout << "     * Booking ID: " << bookings[j].id
+                        << " | Service: " << sName
+                        << " (RM " << fixed << setprecision(2) << price << ")"
+                        << " | Date: " << bookings[j].date
+                        << " | Status: " << statusStr << "\n";
+                }
+            }
+
+            if (!hasBookings) {
+                cout << "     (No active bookings found for this student)\n";
+            }
+            else {
+                cout << "  Total Spent: RM " << fixed << setprecision(2) << studentTotalSpent << "\n";
+            }
+            cout << "-----------------------------------------------------------------------\n";
+            cout << "=======================================================================\n\n";
+
+            break; 
+        }
+    }
+
+    if (!found) {
+        cout << "\nStudent with ID \"" << targetID << "\" not found!\n" << endl;
+    }
+}
 void statisticsReport() {
     cout << "\n=======================================================================\n";
     cout << "                             STATISTICS REPORT                         \n";
