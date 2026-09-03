@@ -292,9 +292,9 @@ void addStudent() {
 
 
 void displayStudents() {
-    if (studentCount == 0) {                     // ✅ Check first
+    if (studentCount == 0) {                     
         cout << "No student records available!\n";
-        return;                                  // Exit early
+        return;                                  
     }
 
     cout << "\n--- Student Records ---\n";
