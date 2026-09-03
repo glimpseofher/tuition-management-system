@@ -61,7 +61,6 @@ string getNameByID(Service records[], int count, string id);
 string dateconv();
 
 void addStudent();
-void searchStudent();
 void updateStudent();
 void displayStudents();
 void deleteStudent();
@@ -75,7 +74,7 @@ void createBooking();
 void displayBookings();
 void updateBooking();
 void deleteBooking();
-void searchBooking();   
+void searchBooking();
 
 void markAttendance();
 void displayAttendance();
@@ -157,18 +156,18 @@ void preloaded()
     students[4] = { "5","Asher Goh Soon Datt",18 };
     studentCount = 5;
 
-    services[0] = { "1","Problem Solving And Programming",167.67};
+    services[0] = { "1","Problem Solving And Programming",167.67 };
     services[1] = { "2","English For Teritiary Studies  ",123.00 };
     services[2] = { "3","Calculus And Algebra           ",250.52 };
     serviceCount = 3;
 
-    bookings[0] = { "1", students[0].id , services[1].id ,"20261010"};
+    bookings[0] = { "1", students[0].id , services[1].id ,"20261010" };
     bookings[1] = { "2", students[1].id , services[2].id, "20260714" };
     bookingCount = 2;
 }
 // ======================= HELPER FUNCTION =======================
 
-string getNameByID(Student records[], int count, string id) 
+string getNameByID(Student records[], int count, string id)
 {
     for (int i = 0; i < count; i++) {
         if (records[i].id == id) return records[i].name;
@@ -176,11 +175,11 @@ string getNameByID(Student records[], int count, string id)
     return "Name NOT FOUND!";
 }
 
-string getNameByID(Service records[], int count, string id) 
+string getNameByID(Service records[], int count, string id)
 {
-    for (int i = 0; i < count; i++) 
+    for (int i = 0; i < count; i++)
     {
-        if (records[i].id == id) 
+        if (records[i].id == id)
             return records[i].name;
     }
     return "Name NOT FOUND!";
@@ -266,41 +265,74 @@ void deleteAttendance() {
 
 // ======================= USER MANAGEMENT =======================
 void addStudent() {
+    string id, name;
+    int age;
     if (studentCount >= MAX_RECORDS) {
         cout << "Storage full!\n";
         return;
     }
-    string id, name;
-    int age;
+
     cout << "Enter Student ID: "; getline(cin, id);
     if (IDexists(students, studentCount, id)) {
-        cout << "Duplicate ID!\n";
+        cout << "Duplicate ID! Please enter again.\n";
         return;
     }
-    cout << "Enter Name: "; getline(cin, name);
-    age = getIntInput("Enter Age: ");
+    cout << "Enter Student Name: "; getline(cin, name);
+
+    do {
+        age = getIntInput("Enter Age: ");
+        if (age <= 0) {
+            cout << "Invalid age! Please enter a positive age.\n";
+        }
+    } while (age <= 0);
+
     students[studentCount++] = { id, name, age };
     cout << "Student added!\n";
 }
 
+
 void displayStudents() {
+    if (studentCount == 0) {                     // ✅ Check first
+        cout << "No student records available!\n";
+        return;                                  // Exit early
+    }
+
     cout << "\n--- Student Records ---\n";
     for (int i = 0; i < studentCount; i++) {
-        cout << students[i].id << " | " << students[i].name << " | " << students[i].age << endl;
+        cout << students[i].id << " | "
+            << students[i].name << " | "
+            << students[i].age << endl;
     }
 }
 
+
 void updateStudent() {
     string id;
-    cout << "Enter Student ID to update: "; getline(cin, id);
+
+    cout << "Enter Student ID to update: ";
+    getline(cin, id);
+
     for (int i = 0; i < studentCount; i++) {
+
         if (students[i].id == id) {
-            cout << "Enter new name: "; getline(cin, students[i].name);
-            students[i].age = getIntInput("Enter new age: ");
+
+            cout << "Enter new name: ";
+            getline(cin, students[i].name);
+
+            do {
+                students[i].age = getIntInput("Enter new age: ");
+
+                if (students[i].age <= 0) {
+                    cout << "Invalid age! Please enter a positive age.\n";
+                }
+
+            } while (students[i].age <= 0);
+
             cout << "Student updated!\n";
             return;
         }
     }
+
     cout << "Student not found!\n";
 }
 
@@ -471,13 +503,13 @@ void displayBookings()
 {
 
     cout << endl << "===============================================" << endl;
-    cout << right << setw(30) <<"BOOKING MODULE";
+    cout << right << setw(30) << "BOOKING MODULE";
     cout << endl << "===============================================" << endl;
     for (int i = 0; i < bookingCount; ++i)
     {
-        cout << left << "Index" << setw(5) << "|Student Name" << setw(20) << right << "|Service Name" << setw(28) << "|Date" << endl;
-        cout << left << setw(5) << bookings[i].id << "|" << setw(19) << getNameByID(students, studentCount, bookings[i].studentID) << "|"
-             << setw(35) << getNameByID(services, serviceCount, bookings[i].serviceID) << "|" << bookings[i].date << endl;
+        cout << left << "Index" << setw(5) << "|Student Name" << setw(30) << right << "|Service Name" << setw(28) << "|Date" << endl;
+        cout << left << setw(5) << bookings[i].id << "|" << setw(29) << getNameByID(students, studentCount, bookings[i].studentID) << "|"
+            << setw(35) << getNameByID(services, serviceCount, bookings[i].serviceID) << "|" << bookings[i].date << endl;
         cout << "===============================================" << endl;
 
     }
@@ -499,6 +531,10 @@ void updateBooking()
             bookings[i].date = dateconv();
             cout << "Booking succesfully updated!" << endl;
             return;
+        }
+        else
+        {
+            cout << "Booking records not found!" << endl;
         }
     }
 }
@@ -536,22 +572,42 @@ void searchBooking()
 void deleteBooking()
 {
     string id;
+    char confirmation;
     cout << "Enter Booking ID to delete: ";
     getline(cin, id);
     for (int i = 0; i < bookingCount; i++)
     {
         if (bookings[i].id == id)
         {
-            for (int j = i; j < bookingCount - 1; j++)
+            cout << "Are you sure to delete this booking?(Y/N):";
+            cin >> confirmation;
+            switch (confirmation)
             {
-                bookings[j] = bookings[j + 1];
+            case 'y':
+            case 'Y':
+            {
+                for (int j = i; j < bookingCount - 1; j++)
+                {
+                    bookings[j] = bookings[j + 1];
+                    bookingCount--;
+                    cout << "Booking deleted!" << endl;
+                    return;
+                }
             }
-            bookingCount--;
-            cout << "Booking deleted!\n";
-            return;
+            case 'N':
+            case'n':
+                cout << "Action canceled!" << endl;
+                return;
+            default:
+            {
+                cout << "invalid character detected,Try Again" << endl;
+                continue;
+            }
+            }
+
         }
     }
-    cout << "Booking not found!\n";
+    cout << "Booking not found!" << endl;
 }
 
 // ======================= REPORT MODULE =======================
@@ -964,9 +1020,10 @@ void bookingMenu()
         case 5: deleteBooking();
             break;
         case 0:
-            cout << "Exiting to main menu...\n"; break;
+            cout << "Exiting to main menu..." << endl;
+            break;
         default:
-            cout << "Invalid choice!\n";
+            cout << "Invalid choice!" << endl;
         }
     } while (choice != 0);
 }
