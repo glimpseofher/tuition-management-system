@@ -75,6 +75,7 @@ void createBooking();
 void displayBookings();
 void updateBooking();
 void deleteBooking();
+void searchBooking();   
 
 void markAttendance();
 void displayAttendance();
@@ -91,20 +92,17 @@ void studentMenu();
 void serviceMenu();
 void bookingMenu();
 void attendanceMenu();
-void reportMenu();
 void preloaded();
 void mainMenu();
 // ======================= MAIN FUNCTION =======================
 int main()
 {
-
+    preloaded();
     mainMenu();
     return 0;
 }
 
 // ====== Function Definitions ======
-
-
 // ======================= VALIDATION =======================
 int getIntInput(string prompt) {
     int choice;
@@ -150,18 +148,40 @@ bool IDexists(Attendance records[], int count, string id) {
     return false;
 }
 
+void preloaded()
+{
+    students[0] = { "1","Tyler Lee Yan Xuan ",17 };
+    students[1] = { "2","Chong Yu Xuan      ",02 };
+    students[2] = { "3","Lee Sheng Loong    ",18 };
+    students[3] = { "4","Ho Zi Hao          ",18 };
+    students[4] = { "5","Asher Goh Soon Datt",18 };
+    studentCount = 5;
+
+    services[0] = { "1","Problem Solving And Programming",167.67};
+    services[1] = { "2","English For Teritiary Studies  ",123.00 };
+    services[2] = { "3","Calculus And Algebra           ",250.52 };
+    serviceCount = 3;
+
+    bookings[0] = { "1", students[0].id , services[1].id ,"20261010"};
+    bookings[1] = { "2", students[1].id , services[2].id, "20260714" };
+    bookingCount = 2;
+}
 // ======================= HELPER FUNCTION =======================
 
-string getNameByID(Student records[], int count, string id) {
+string getNameByID(Student records[], int count, string id) 
+{
     for (int i = 0; i < count; i++) {
         if (records[i].id == id) return records[i].name;
     }
     return "Name NOT FOUND!";
 }
 
-string getNameByID(Service records[], int count, string id) {
-    for (int i = 0; i < count; i++) {
-        if (records[i].id == id) return records[i].name;
+string getNameByID(Service records[], int count, string id) 
+{
+    for (int i = 0; i < count; i++) 
+    {
+        if (records[i].id == id) 
+            return records[i].name;
     }
     return "Name NOT FOUND!";
 }
@@ -357,7 +377,6 @@ void deleteService() {
 }
 
 // ======================= BOOKING MANAGEMENT =======================
-// ======================= BOOKING MANAGEMENT =======================
 
 string dateconv()
 {
@@ -369,7 +388,7 @@ string dateconv()
         cin >> day >> month >> year;
         if (year < 2026 || year > 2099 || month <= 0 || month > 12 || day <= 0 || day > 31)
         {
-            cout << "Invalid input or zero input" << endl;
+            cout << "I  " << endl;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
@@ -384,7 +403,6 @@ string dateconv()
     string sdate = to_string(date);
     return sdate;
 }
-
 
 void createBooking()
 {
@@ -421,30 +439,29 @@ void createBooking()
 
     cout << "Enter Student ID: ";
     cin >> booking.studentID;
-    if (!IDexists(students, studentCount, booking.studentID))
-    {
-        cout << "Student ID Not Found\n";
-        return;
-    }
-    else
+    if (IDexists(students, studentCount, booking.studentID))
     {
         cout << "Student ID accepted!" << endl << endl;
     }
+    else
+    {
+        cout << "Student ID Not Found" << endl;
+        return;
+    }
     cout << "Enter Service ID: ";
     cin >> booking.serviceID;
-    if (!IDexists(services, serviceCount, booking.serviceID))
+    if (IDexists(services, serviceCount, booking.serviceID))
+    {
+        cout << "Service ID accepted!" << endl;
+    }
+    else
     {
         cout << "Service ID Not found!" << endl;
         return;
     }
-    else
-    {
-        cout << "Booking ID accepted!" << endl;
-    }
 
     Booking stuff;
     booking.date = dateconv();
-
     bookings[bookingCount++] = booking;
     cout << "Booking succesfully created!" << endl;
 
@@ -454,15 +471,17 @@ void displayBookings()
 {
 
     cout << endl << "===============================================" << endl;
-    cout << setw(30) << "BOOKING MODULE" << endl;
-    cout << "===============================================" << endl;
-    for (int i = 0; i < bookingCount; i++)
+    cout << right << setw(30) <<"BOOKING MODULE";
+    cout << endl << "===============================================" << endl;
+    for (int i = 0; i < bookingCount; ++i)
     {
-        cout << bookings[i].id << " | ";
-        cout << getNameByID(students, studentCount, bookings[i].studentID) << " | ";
-        cout << getNameByID(services, serviceCount, bookings[i].serviceID) << " | ";
-        cout << bookings[i].date << endl;
+        cout << left << "Index" << setw(5) << "|Student Name" << setw(20) << right << "|Service Name" << setw(28) << "|Date" << endl;
+        cout << left << setw(5) << bookings[i].id << "|" << setw(19) << getNameByID(students, studentCount, bookings[i].studentID) << "|"
+             << setw(35) << getNameByID(services, serviceCount, bookings[i].serviceID) << "|" << bookings[i].date << endl;
+        cout << "===============================================" << endl;
+
     }
+
 }
 
 void updateBooking()
@@ -481,12 +500,7 @@ void updateBooking()
             cout << "Booking succesfully updated!" << endl;
             return;
         }
-        else
-        {
-            cout << "Booking not found,Try Again!" << endl;
-        }
     }
-
 }
 
 void searchBooking()
@@ -496,8 +510,7 @@ void searchBooking()
         cout << "No bookings available to search!\n";
         return;
     }
-    Booking booking; 
-
+    Booking booking;
     cout << "Enter Booking ID to search: ";
     cin >> booking.id;
 
@@ -506,7 +519,7 @@ void searchBooking()
         if (bookings[i].id == booking.id)
         {
             cout << endl << "===============================================" << endl;
-            cout << setw(35) << "Booking found";
+            cout << setw(35) << right << "Booking found";
             cout << endl << "===============================================" << endl;
             cout << "Booking ID : " << bookings[i].id << endl;
             cout << "Student    : " << getNameByID(students, studentCount, bookings[i].studentID)
@@ -786,15 +799,15 @@ void serviceBreakdown() { //Track booking amt for service, calc rev per service,
 
 
         cout << left << setw(17) << services[i].name
-             << setw(25) << services[i].id
-             << setw(14) << services[i].price 
-             << setw(16) <<  bookingCountperService
-             << setw(10) << "RM" << fixed << setprecision(2) << perServiceRevenue << endl;
+            << setw(25) << services[i].id
+            << setw(14) << services[i].price
+            << setw(16) << bookingCountperService
+            << setw(10) << "RM" << fixed << setprecision(2) << perServiceRevenue << endl;
     }
     cout << "------------------------------------------------------------------------------------------\n";
     cout << setw(22) << "Total Services :" << serviceCount << endl
-         << setw(22) << "Total Bookings :" << totalBookings << endl
-         << setw(20) << "Total Revenue  :" << "RM" << fixed << setprecision(2) << totalRevenue << endl;
+        << setw(22) << "Total Bookings :" << totalBookings << endl
+        << setw(20) << "Total Revenue  :" << "RM" << fixed << setprecision(2) << totalRevenue << endl;
 
     cout << "\n==========================================================================================\n";
 }
