@@ -501,6 +501,11 @@ void createBooking()
 
 void displayBookings()
 {
+    if (bookingCount == 0)
+    {
+        cout << "No records yet,Plesae make a booking before using this function!" << endl;
+        return;
+    }
 
     cout << endl << "===============================================" << endl;
     cout << right << setw(30) << "BOOKING MODULE";
@@ -608,6 +613,7 @@ void deleteBooking()
     }    cout << "Booking ID not found!" << endl;
 
 }
+
 
 // ======================= REPORT MODULE =======================
 string getServiceNameByID(const string& serviceID) {
