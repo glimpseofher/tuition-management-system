@@ -101,6 +101,7 @@ int main()
     return 0;
 }
 
+// ====== Function Definitions ======
 // ======================= VALIDATION =======================
 int getIntInput(string prompt) {
     int choice;
@@ -291,9 +292,9 @@ void addStudent() {
 
 
 void displayStudents() {
-    if (studentCount == 0) {
+    if (studentCount == 0) {                     // ✅ Check first
         cout << "No student records available!\n";
-        return;
+        return;                                  // Exit early
     }
 
     cout << "\n--- Student Records ---\n";
@@ -365,14 +366,7 @@ void addService() {
         return;
     }
     cout << "Enter Service Name: "; getline(cin, name);
-    do {
-        price = getIntInput("Enter Price: ");
-
-        if (price <= 0) {
-            cout << "Invalid price! Please enter again.\n";
-        }
-
-    } while (price <= 0);
+    cout << "Enter Price: "; cin >> price;
     services[serviceCount++] = { id, name, price };
     cout << "Service added!\n";
 }
@@ -426,7 +420,7 @@ string dateconv()
         cin >> day >> month >> year;
         if (year < 2026 || year > 2099 || month <= 0 || month > 12 || day <= 0 || day > 31)
         {
-            cout << "I  " << endl;
+            cout << "Invalid input or incorrect format detected, Please try again!" << endl;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
@@ -498,7 +492,7 @@ void createBooking()
         return;
     }
 
-    Booking stuff;
+    
     booking.date = dateconv();
     bookings[bookingCount++] = booking;
     cout << "Booking succesfully created!" << endl;
@@ -514,9 +508,9 @@ void displayBookings()
     }
 
     cout << endl << "===============================================" << endl;
-    cout << right << setw(30) << "BOOKING MODULE";
+    cout << right << setw(30) << "BOOKING RECORDS";
     cout << endl << "===============================================" << endl;
-    for (int i = 0; i < bookingCount; ++i)
+    for (int i = 0; i < bookingCount; i++)
     {
         cout << left << "Index" << setw(5) << "|Student Name" << setw(30) << right << "|Service Name" << setw(28) << "|Date" << endl;
         cout << left << setw(5) << bookings[i].id << "|" << setw(29) << getNameByID(students, studentCount, bookings[i].studentID) << "|"
@@ -530,7 +524,8 @@ void displayBookings()
 void updateBooking()
 {
     string changeID;
-    cout << "Enter Booking ID to update: "; getline(cin, changeID);
+    cout << "Enter Booking ID to update: ";
+    getline(cin, changeID);
     for (int i = 0; i < bookingCount; i++)
     {
         if (bookings[i].id == changeID)
@@ -542,16 +537,16 @@ void updateBooking()
             bookings[i].date = dateconv();
             cout << "Booking succesfully updated!" << endl;
             return;
-        }
+        }   
     }
     cout << "Booking records not found!" << endl;
 }
-
+    
 void searchBooking()
 {
     if (bookingCount == 0)
     {
-        cout << "No bookings available to search!\n";
+        cout << "No bookings available to search!" << endl;
         return;
     }
     Booking booking;
@@ -566,15 +561,13 @@ void searchBooking()
             cout << setw(35) << right << "Booking found";
             cout << endl << "===============================================" << endl;
             cout << "Booking ID : " << bookings[i].id << endl;
-            cout << "Student    : " << getNameByID(students, studentCount, bookings[i].studentID)
-                << " (ID: " << bookings[i].studentID << ")" << endl;
-            cout << "Service    : " << getNameByID(services, serviceCount, bookings[i].serviceID)
-                << " (ID: " << bookings[i].serviceID << ")" << endl;
+            cout << "Student    : " << getNameByID(students, studentCount, bookings[i].studentID) << "(ID: " << bookings[i].studentID << ")" << endl;
+            cout << "Service    : " << getNameByID(services, serviceCount, bookings[i].serviceID) << "(ID: " << bookings[i].serviceID << ")" << endl;
             cout << "Date       : " << bookings[i].date << endl;
             return;
-        }
+        }   
     }
-    cout << "No Booking ID found!" << endl;
+    cout << "Booking ID not found!" << endl;
 }
 
 void deleteBooking()
@@ -591,35 +584,34 @@ void deleteBooking()
             cin >> confirmation;
             switch (confirmation)
             {
-            case 'y':
-            case 'Y':
-            {
-                for (int j = i; j < bookingCount - 1; j++)
+                case 'y':
+                case 'Y':
                 {
-                    bookings[j] = bookings[j + 1];
+                    for (int j = i; j < bookingCount - 1; j++)
+                    {
+                        bookings[j] = bookings[j + 1];  
+                    }
+                    bookingCount--;
+                        cout << "Booking deleted!" << endl;
+                        return;
                 }
-                bookingCount--;
-                cout << "Booking deleted!" << endl;
-                return;
-            }
-            case 'N':
-            case'n':
-            {
-                cout << "Action canceled!" << endl;
-                return;
-            }
-            default:
-            {
-                cout << "invalid character detected,Try Again" << endl;
-                return;
-            }
+                case 'N':
+                case'n':
+                {
+                    cout << "Action canceled!" << endl;
+                    return;
+                }
+                default:
+                {
+                    cout << "Invalid character detected,Try Again" << endl;
+                    return;
+                }
             }
 
         }
     }    cout << "Booking ID not found!" << endl;
 
 }
-
 
 // ======================= REPORT MODULE =======================
 string getServiceNameByID(const string& serviceID) {
@@ -695,72 +687,51 @@ void detailedReport() {
         cout << "\nNo student records available.\n" << endl;
         return;
     }
-
-    string targetID;
-    cout << "Please enter an ID to search for: ";
-    if (cin.peek() == '\n')
-        cin.ignore();
-    getline(cin, targetID);
-
-    bool found = false;
-
+    cout << "\n=======================================================================\n";
+    cout << "                          DETAILED STUDENT REPORT                      \n";
+    cout << "=======================================================================\n";
     for (int i = 0; i < studentCount; i++) {
-        if (students[i].id == targetID) {
-            found = true;
-
-            cout << "\n=======================================================================\n";
-            cout << "                          DETAILED STUDENT REPORT                      \n";
-            cout << "=======================================================================\n";
-            cout << "STUDENT PROFILE\n";
-            cout << "  ID   : " << students[i].id << "\n";
-            cout << "  Name : " << students[i].name << "\n";
-            cout << "  Age  : " << students[i].age << "\n";
-            cout << "  -- Bookings & Attendance History --\n";
-
-            bool hasBookings = false;
-            double studentTotalSpent = 0.0;
-
-            for (int j = 0; j < bookingCount; j++) {
-                if (bookings[j].studentID == students[i].id) {
-                    hasBookings = true;
-                    string sName = getServiceNameByID(bookings[j].serviceID);
-                    double price = getServicePriceByID(bookings[j].serviceID);
-                    studentTotalSpent += price;
-
-                    string statusStr = "Not Marked";
-                    for (int k = 0; k < attendanceCount; k++) {
-                        if (attendances[k].studentID == students[i].id &&
-                            attendances[k].serviceID == bookings[j].serviceID &&
-                            attendances[k].date == bookings[j].date) {
-                            statusStr = (attendances[k].status == 1 || attendances[k].status == PRESENT) ? "Present" : "Absent";
-                            break;
-                        }
+        cout << "STUDENT PROFILE #" << (i + 1) << "\n";
+        cout << "  ID   : " << students[i].id << "\n";
+        cout << "  Name : " << students[i].name << "\n";
+        cout << "  Age  : " << students[i].age << "\n";
+        cout << "  -- Bookings & Attendance History --\n";
+        bool hasBookings = false;
+        double studentTotalSpent = 0.0;
+        for (int j = 0; j < bookingCount; j++) {
+            if (bookings[j].studentID == students[i].id) {
+                hasBookings = true;
+                string sName = getServiceNameByID(bookings[j].serviceID);
+                double price = getServicePriceByID(bookings[j].serviceID);
+                studentTotalSpent += price;
+                // Find matching attendance record status
+                string statusStr = "Not Marked";
+                for (int k = 0; k < attendanceCount; k++) {
+                    if (attendances[k].studentID == students[i].id &&
+                        attendances[k].serviceID == bookings[j].serviceID &&
+                        attendances[k].date == bookings[j].date) {
+                        statusStr = (attendances[k].status == 1 || attendances[k].status == PRESENT) ? "Present" : "Absent";
+                        break;
                     }
-                    cout << "     * Booking ID: " << bookings[j].id
-                        << " | Service: " << sName
-                        << " (RM " << fixed << setprecision(2) << price << ")"
-                        << " | Date: " << bookings[j].date
-                        << " | Status: " << statusStr << "\n";
                 }
+                cout << "     * Booking ID: " << bookings[j].id
+                    << " | Service: " << sName
+                    << " (RM " << fixed << setprecision(2) << price << ")"
+                    << " | Date: " << bookings[j].date
+                    << " | Status: " << statusStr << "\n";
             }
-
-            if (!hasBookings) {
-                cout << "     (No active bookings found for this student)\n";
-            }
-            else {
-                cout << "  Total Spent: RM " << fixed << setprecision(2) << studentTotalSpent << "\n";
-            }
-            cout << "-----------------------------------------------------------------------\n";
-            cout << "=======================================================================\n\n";
-
-            break;
         }
+        if (!hasBookings) {
+            cout << "     (No active bookings found for this student)\n";
+        }
+        else {
+            cout << "  Total Spent: RM " << fixed << setprecision(2) << studentTotalSpent << "\n";
+        }
+        cout << "-----------------------------------------------------------------------\n";
     }
-
-    if (!found) {
-        cout << "\nStudent with ID \"" << targetID << "\" not found!\n" << endl;
-    }
+    cout << "=======================================================================\n\n";
 }
+
 void statisticsReport() {
     cout << "\n=======================================================================\n";
     cout << "                             STATISTICS REPORT                         \n";
@@ -1055,7 +1026,7 @@ void bookingMenu()
             cout << "Exiting to main menu..." << endl;
             break;
         default:
-            cout << "Invalid choice!" << endl;
+            cout << "   " << endl;
         }
     } while (choice != 0);
 }
