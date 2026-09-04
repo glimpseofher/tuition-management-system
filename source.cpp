@@ -101,7 +101,6 @@ int main()
     return 0;
 }
 
-// ====== Function Definitions ======
 // ======================= VALIDATION =======================
 int getIntInput(string prompt) {
     int choice;
@@ -292,9 +291,9 @@ void addStudent() {
 
 
 void displayStudents() {
-    if (studentCount == 0) {                     
+    if (studentCount == 0) {
         cout << "No student records available!\n";
-        return;                                  
+        return;
     }
 
     cout << "\n--- Student Records ---\n";
@@ -366,7 +365,14 @@ void addService() {
         return;
     }
     cout << "Enter Service Name: "; getline(cin, name);
-    cout << "Enter Price: "; cin >> price;
+    do {
+        price = getIntInput("Enter Price: ");
+
+        if (price <= 0) {
+            cout << "Invalid price! Please enter again.\n";
+        }
+
+    } while (price <= 0);
     services[serviceCount++] = { id, name, price };
     cout << "Service added!\n";
 }
@@ -585,28 +591,28 @@ void deleteBooking()
             cin >> confirmation;
             switch (confirmation)
             {
-                case 'y':
-                case 'Y':
+            case 'y':
+            case 'Y':
+            {
+                for (int j = i; j < bookingCount - 1; j++)
                 {
-                    for (int j = i; j < bookingCount - 1; j++)
-                    {
-                        bookings[j] = bookings[j + 1];  
-                    }
-                    bookingCount--;
-                        cout << "Booking deleted!" << endl;
-                        return;
+                    bookings[j] = bookings[j + 1];
                 }
-                case 'N':
-                case'n':
-                {
-                    cout << "Action canceled!" << endl;
-                    return;
-                }
-                default:
-                {
-                    cout << "invalid character detected,Try Again" << endl;
-                    return;
-                }
+                bookingCount--;
+                cout << "Booking deleted!" << endl;
+                return;
+            }
+            case 'N':
+            case'n':
+            {
+                cout << "Action canceled!" << endl;
+                return;
+            }
+            default:
+            {
+                cout << "invalid character detected,Try Again" << endl;
+                return;
+            }
             }
 
         }
@@ -693,7 +699,7 @@ void detailedReport() {
     string targetID;
     cout << "Please enter an ID to search for: ";
     if (cin.peek() == '\n')
-    cin.ignore();
+        cin.ignore();
     getline(cin, targetID);
 
     bool found = false;
@@ -747,7 +753,7 @@ void detailedReport() {
             cout << "-----------------------------------------------------------------------\n";
             cout << "=======================================================================\n\n";
 
-            break; 
+            break;
         }
     }
 
