@@ -156,9 +156,9 @@ void preloaded()
     students[4] = { "5","Asher Goh Soon Datt",18 };
     studentCount = 5;
 
-    services[0] = { "1","Problem Solving And Programming",167.67 };
-    services[1] = { "2","English For Teritiary Studies  ",123.00 };
-    services[2] = { "3","Calculus And Algebra           ",250.52 };
+    services[0] = { "1","PSP",167.67 };
+    services[1] = { "2","ENG",123.00 };
+    services[2] = { "3","CAL",250.52 };
     serviceCount = 3;
 
     bookings[0] = { "1", students[0].id , services[1].id ,"20261010" };
