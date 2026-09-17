@@ -366,7 +366,9 @@ void addService() {
         return;
     }
     cout << "Enter Service Name: "; getline(cin, name);
-    cout << "Enter Price: "; cin >> price;
+    do {
+        cout << "Enter Price: "; cin >> price;
+    }while(prive < 0}
     services[serviceCount++] = { id, name, price };
     cout << "Service added!\n";
 }
